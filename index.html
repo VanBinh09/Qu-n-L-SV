@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản lý sinh viên</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    #studentSection, #userProfile {
+      display: none;
+    }
+    #userProfile {
+      justify-content: end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    #userProfile img {
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+    }
+  </style>
+</head>
+<body class="container py-5">
+  <div class="text-center mb-3">
+      <img src="https://www.stu.edu.vn/images/logo1.png" alt="Logo STU" style="max-width: 100%; height: auto;">
+    </div>
+
+  <h2 class="mb-3">Hệ thống quản lý sinh viên</h2>
+
+  <div id="loginBox">
+    <h3>Đăng nhập</h3>
+    <form id="loginForm">
+      <input type="text" id="loginEmail" class="form-control mb-2" placeholder="Email hoặc tên đăng nhập" required>
+      <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Mật khẩu" required>
+      <button type="submit" class="btn btn-primary">Đăng nhập</button>
+    </form>
+    <p class="mt-2">Chưa có tài khoản? <button class="btn btn-link p-0" onclick="toggleForm('register')">Đăng ký</button></p>
+  </div>
+
+  <div id="registerBox" style="display:none;">
+    <h3>Đăng ký</h3>
+    <form id="registerForm">
+      <input type="email" id="regEmail" class="form-control mb-2" placeholder="Email" required>
+      <input type="text" id="regPhone" class="form-control mb-2" placeholder="Số điện thoại" required>
+      <input type="text" id="regUsername" class="form-control mb-2" placeholder="Tên đăng nhập" required>
+      <input type="password" id="regPassword" class="form-control mb-2" placeholder="Mật khẩu" required>
+      <button type="submit" class="btn btn-secondary">Đăng ký</button>
+    </form>
+    <p class="mt-2">Đã có tài khoản? <button class="btn btn-link p-0" onclick="toggleForm('login')">Đăng nhập</button></p>
+  </div>
+<tbody>
+  <!-- Giao diện sau đăng nhập -->
+  <div id="studentSection">
+    <div id="userProfile" class="d-flex">
+      <img id="userAvatar" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlLWf8yERxoUkcvzWP05KiO5LosNr7npPJcg&s  " />
+      <span id="userName" class="fw-bold fst-italic">Admin</span>
+      <button id="btnUserInfo" class="btn btn-sm btn-info text-white">Xem thông tin</button>
+    </div>
+
+    <form id="studentForm" class="mb-3 d-flex flex-wrap gap-2">
+      <input type="text" id="id" class="form-control" placeholder="ID" required>
+      <input type="text" id="name" class="form-control" placeholder="Họ tên" required>
+      <input type="date" id="dob" class="form-control" required>
+      <select id="gender" class="form-control" required>
+        <option value="">Giới tính</option>
+        <option value="Nam">Nam</option>
+        <option value="Nữ">Nữ</option>
+      </select>
+      <input type="text" id="class" class="form-control" placeholder="Lớp" required>
+      <input type="text" id="avatar" class="form-control" placeholder="Link ảnh đại diện">
+      <button class="btn btn-success">Lưu</button>
+    </form>
+
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Họ tên</th>
+          <th>Ngày sinh</th>
+          <th>Giới tính</th>
+          <th>Lớp</th>
+          <th>Ảnh</th>
+          <th>Tùy chọn</th>
+        </tr>
+      </thead>
+      <tbody id="studentTable"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal xác nhận xóa -->
+  <div class="modal" id="modalConfirm" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          Bạn có chắc muốn xóa sinh viên này?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-danger" id="modalConfirmBtn">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal thông tin tài khoản -->
+  <div class="modal" id="modalUserInfo" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content p-3">
+        <h5>Thông tin tài khoản</h5>
+        <p><strong>Email:</strong> <span id="infoEmail"></span></p>
+        <p><strong>SĐT:</strong> <span id="infoPhone"></span></p>
+        <p><strong>Tên đăng nhập:</strong> <span id="infoUsername"></span></p>
+        <div class="text-end">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</tbody>
+  <script type="module" src="index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
