@@ -9,6 +9,7 @@ const studentTable = document.getElementById("studentTable");
 const modalConfirm = new bootstrap.Modal(document.getElementById("modalConfirm"));
 const modalConfirmBtn = document.getElementById("modalConfirmBtn");
 
+
 window.toggleForm = function(type) {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("registerBox").style.display = "none";
@@ -23,12 +24,25 @@ function showStudentSection() {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("registerBox").style.display = "none";
   document.getElementById("studentSection").style.display = "block";
-  document.getElementById("userProfile").style.display = "flex";
+  document.getElementById("userProfile").style.display = "flex"; // Đã thêm để hiển thị userProfile
+  document.getElementById("studentDashboard").style.display = "none";
 }
 
-function hideStudentSection() {
+function showStudentDashboard() {
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("registerBox").style.display = "none";
   document.getElementById("studentSection").style.display = "none";
-  document.getElementById("userProfile").style.display = "none";
+  document.getElementById("userProfile").style.display = "none"; // Đã thêm để ẩn userProfile khi ở dashboard
+  document.getElementById("studentDashboard").style.display = "block";
+  document.getElementById("studentName").textContent = currentUser.username;
+}
+
+function hideAllSections() {
+  document.getElementById("studentSection").style.display = "none";
+  document.getElementById("userProfile").style.display = "none"; // Đã thêm để ẩn userProfile khi ẩn tất cả
+  document.getElementById("studentDashboard").style.display = "none";
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("registerBox").style.display = "none";
 }
 
 function renderTable() {
@@ -127,10 +141,16 @@ loginForm.onsubmit = (e) => {
   if (found) {
     currentUser = found;
     saveToStorage(currentUser, "currentUser");
-    document.getElementById("userAvatar").src = currentUser.avatar || "https://via.placeholder.com/40";
-    document.getElementById("userName").textContent = currentUser.username;
-    showStudentSection();
-    renderTable();
+    if (currentUser.role === "admin") {
+      document.getElementById("userAvatar").src = currentUser.avatar || "https://via.placeholder.com/40"; // Đã sửa currentUser.userAvatar thành currentUser.avatar
+      document.getElementById("userName").textContent = currentUser.username;
+      showStudentSection();
+      renderTable(); // Gọi renderTable cho admin
+    } else if (currentUser.role === "user") {
+      showStudentDashboard();
+    } else {
+      alert("Tài khoản không hợp lệ.");
+    }
   } else {
     alert("Tài khoản hoặc mật khẩu không đúng!");
   }
@@ -149,13 +169,14 @@ registerForm.onsubmit = (e) => {
     alert("Tài khoản đã tồn tại!");
     return;
   }
-  accounts.push({ email, phone, username, password });
+  accounts.push({ email, phone, username, password , role: "user" });
   saveToStorage(accounts, "accounts");
   alert("Đăng ký thành công! Bạn có thể đăng nhập.");
   toggleForm("login");
 };
 
-document.getElementById("btnUserInfo").onclick = () => {
+// Sử dụng ủy quyền sự kiện hoặc đảm bảo ID duy nhất cho các nút này
+document.getElementById("btnUserInfo").onclick = () => { // Xử lý cho nút "Thông tin" của Admin
   if (currentUser) {
     document.getElementById("infoEmail").value = currentUser.email || "";
     document.getElementById("infoPhone").value = currentUser.phone || "";
@@ -164,6 +185,17 @@ document.getElementById("btnUserInfo").onclick = () => {
     modal.show();
   }
 };
+
+document.getElementById("btnStudentInfo").onclick = () => { // Xử lý cho nút "Cập nhật thông tin cá nhân" của User
+  if (currentUser) {
+    document.getElementById("infoEmail").value = currentUser.email || "";
+    document.getElementById("infoPhone").value = currentUser.phone || "";
+    document.getElementById("infoUsername").value = currentUser.username || "";
+    const modal = new bootstrap.Modal(document.getElementById("modalUserInfo"));
+    modal.show();
+  }
+};
+
 
 document.getElementById("btnEditUser").onclick = () => {
   const newEmail = document.getElementById("infoEmail").value;
@@ -177,7 +209,12 @@ document.getElementById("btnEditUser").onclick = () => {
     currentUser = accounts[index];
     saveToStorage(currentUser, "currentUser");
     saveToStorage(accounts, "accounts");
-    document.getElementById("userName").textContent = currentUser.username;
+    
+    const userNameLabel = document.getElementById("userName");
+    if (userNameLabel) userNameLabel.textContent = currentUser.username;
+    const studentNameLabel = document.getElementById("studentName");
+    if (studentNameLabel) studentNameLabel.textContent = currentUser.username;
+
     alert("Cập nhật thông tin thành công!");
   }
 };
@@ -185,20 +222,55 @@ document.getElementById("btnEditUser").onclick = () => {
 document.getElementById("btnLogout").onclick = () => {
   localStorage.removeItem("currentUser");
   currentUser = null;
-  hideStudentSection();
+  hideAllSections(); // Đã sửa từ hideStudentSection()
   toggleForm("login");
 };
+
+document.getElementById("btnUserLogout").onclick = () => {
+  localStorage.removeItem("currentUser");
+  currentUser = null;
+  hideAllSections(); // Đã sửa logic để chỉ đăng xuất và hiển thị form đăng nhập
+  toggleForm("login");
+};
+
+document.getElementById("btnCreateUser")?.addEventListener("click", () => {
+  const email = prompt("Nhập email người dùng:");
+  const phone = prompt("Nhập số điện thoại:");
+  const username = prompt("Nhập tên đăng nhập:");
+  const password = prompt("Nhập mật khẩu:");
+
+  if (!email || !phone || !username || !password) {
+    alert("Vui lòng nhập đầy đủ thông tin!");
+    return;
+  }
+
+  const accounts = loadFromStorage("accounts") || [];
+  if (accounts.some(acc => acc.email === email || acc.username === username)) {
+    alert("Email hoặc tên đăng nhập đã tồn tại!");
+    return;
+  }
+
+  accounts.push({ email, phone, username, password, role: "user" });
+  saveToStorage(accounts, "accounts");
+  alert("Tạo tài khoản người dùng thành công!");
+});
 
 window.addEventListener("DOMContentLoaded", () => {
   currentUser = loadFromStorage("currentUser");
   if (currentUser && currentUser.username) {
-    document.getElementById("userAvatar").src = currentUser.avatar || "data:image/jpeg;base64,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";
-    document.getElementById("userName").textContent = currentUser.username;
-    showStudentSection();
-    renderTable();
+    if (currentUser.role === "admin") {
+      document.getElementById("userAvatar").src = currentUser.avatar || "https://via.placeholder.com/40"; // Đã sửa currentUser.userAvatar thành currentUser.avatar
+      document.getElementById("userName").textContent = currentUser.username;
+      showStudentSection();
+      renderTable();
+    } else if (currentUser.role === "user") {
+      showStudentDashboard();
+    } else {
+      toggleForm("login");
+    }
   } else {
     currentUser = null;
-    hideStudentSection();
+    hideAllSections(); // Đã thêm để đảm bảo tất cả các phần bị ẩn khi không có người dùng đăng nhập
     toggleForm("login");
   }
 });

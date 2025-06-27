@@ -6,7 +6,7 @@
   <title>Quản lý sinh viên</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <style>
-    #studentSection, #userProfile {
+    #studentSection, #userProfile, #studentDashboard { /* Đặt mặc định là none cho tất cả các phần chính */
       display: none;
     }
     #userProfile {
@@ -20,13 +20,11 @@
       width: 40px;
       height: 40px;
     }
+    thead tr {
+      background-color: #007bff;
+      color: white;
+    }
   </style>
-  <style>
-  thead tr {
-    background-color: #007bff;
-    color: white;
-  }
-</style>
 </head>
 <body class="container py-5">
   <div class="text-center mb-3">
@@ -35,29 +33,16 @@
 
   <h2 class="mb-3">Hệ thống quản lý sinh viên</h2>
 
-  <div id="loginBox">
-    <h3>Đăng nhập</h3>
-    <form id="loginForm">
-      <input type="text" id="loginEmail" class="form-control mb-2" placeholder="Email hoặc tên đăng nhập" required>
-      <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Mật khẩu" required>
-      <button type="submit" class="btn btn-primary">Đăng nhập</button>
-    </form>
-    <p class="mt-2">Chưa có tài khoản? <button class="btn btn-link p-0" onclick="toggleForm('register')">Đăng ký</button></p>
-  </div>
-
-  <div id="registerBox" style="display:none;">
-    <h3>Đăng ký</h3>
-    <form id="registerForm">
-      <input type="email" id="regEmail" class="form-control mb-2" placeholder="Email" required>
-      <input type="text" id="regPhone" class="form-control mb-2" placeholder="Số điện thoại" required>
-      <input type="text" id="regUsername" class="form-control mb-2" placeholder="Tên đăng nhập" required>
-      <input type="password" id="regPassword" class="form-control mb-2" placeholder="Mật khẩu" required>
-      <button type="submit" class="btn btn-secondary">Đăng ký</button>
-    </form>
-    <p class="mt-2">Đã có tài khoản? <button class="btn btn-link p-0" onclick="toggleForm('login')">Đăng nhập</button></p>
-  </div>
-<tbody>
-    <!-- Đăng ký -->
+  <div class="container mt-5">
+    <div id="loginBox">
+      <h2>Đăng nhập</h2>
+      <form id="loginForm">
+        <input type="text" id="loginEmail" class="form-control mb-2" placeholder="Email hoặc Tên đăng nhập" required />
+        <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Mật khẩu" required />
+        <button class="btn btn-success">Đăng nhập</button>
+      </form>
+      <p class="mt-2">Chưa có tài khoản? <a href="#" onclick="toggleForm('register')">Đăng ký</a></p>
+    </div>
     <div id="registerBox" style="display: none">
       <h2>Đăng ký</h2>
       <form id="registerForm">
@@ -69,21 +54,17 @@
       </form>
       <p class="mt-2">Đã có tài khoản? <a href="#" onclick="toggleForm('login')">Đăng nhập</a></p>
     </div>
-
-    <!-- Giao diện quản lý học viên -->
     <div id="studentSection" style="display: none">
       <div id="userProfile" class="d-flex align-items-center mb-3">
-        <img id="userAvatar" src="" width="40" height="40" style="border-radius: 50%;" />
+        <img id="userAvatar" src="https://via.placeholder.com/40" width="40" height="40" style="border-radius: 50%;" />
         <span id="userName" class="ms-2 me-3 fw-bold">Admin</span>
         <button id="btnUserInfo" class="btn btn-info btn-sm me-2">Thông tin</button>
+        <button id="btnCreateUser" class="btn btn-secondary btn-sm me-2">Tạo tài khoản người dùng</button>
         <button id="btnLogout" class="btn btn-danger btn-sm">Đăng xuất</button>
       </div>
-
       <div class="mb-3">
         <button id="btnAdd" class="btn btn-primary">Thêm mới</button>
-      </div>
-
-      <!-- Form thêm/sửa -->
+      </div> 
       <div id="studentFormContainer" style="display: none;">
         <form id="studentForm" class="mb-4">
           <input type="text" id="id" class="form-control mb-2" placeholder="ID" required />
@@ -95,12 +76,10 @@
           <button class="btn btn-success">Lưu</button>
         </form>
       </div>
-
-      <!-- Bảng sinh viên -->
       <table class="table table-bordered">
-        <thead  class="table-primary"> 
-          <tr >
-            <th >ID</th>
+        <thead class="table-primary">
+          <tr>
+            <th>ID</th>
             <th>Họ tên</th>
             <th>Ngày sinh</th>
             <th>Giới tính</th>
@@ -112,53 +91,42 @@
         <tbody id="studentTable"></tbody>
       </table>
     </div>
-  </div>
-
-  <!-- Modal xác nhận xóa -->
-  <div class="modal fade" id="modalConfirm" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content p-4">
-        <h5 class="modal-title">Xác nhận</h5>
-        <div class="modal-body">
-          <p>Bạn có chắc chắn muốn xóa sinh viên này?</p>
+    <div id="studentDashboard" style="display: none" class="container mt-4">
+      <h3>Chào bạn, <span id="studentName"></span>!</h3>
+      <button id="btnStudentInfo" class="btn btn-info mt-3">Cập nhật thông tin cá nhân</button>
+       <button id="btnUserLogout" class="btn btn-danger mt-3">Đăng xuất</button>
+    </div>
+    <div class="modal fade" id="modalConfirm" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content p-4">
+          <h5 class="modal-title">Xác nhận</h5>
+          <div class="modal-body"><p>Bạn có chắc chắn muốn xóa sinh viên này?</p></div>
+          <div class="modal-footer">
+            <button id="modalConfirmBtn" class="btn btn-danger">Xóa</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button id="modalConfirmBtn" class="btn btn-danger">Xóa</button>
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+      </div>
+    </div>
+    <div class="modal fade" id="modalUserInfo" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content p-4">
+          <h5 class="modal-title">Thông tin tài khoản</h5>
+          <div class="modal-body">
+            <div class="mb-2"><label for="infoEmail" class="form-label">Email</label><input type="email" id="infoEmail" class="form-control" /></div>
+            <div class="mb-2"><label for="infoPhone" class="form-label">Số điện thoại</label><input type="text" id="infoPhone" class="form-control" /></div>
+            <div class="mb-2"><label for="infoUsername" class="form-label">Tên đăng nhập</label><input type="text" id="infoUsername" class="form-control" /></div>
+          </div>
+          <div class="modal-footer">
+            <button id="btnEditUser" class="btn btn-warning">Cập nhật</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Modal thông tin người dùng -->
-  <div class="modal fade" id="modalUserInfo" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content p-4">
-        <h5 class="modal-title">Thông tin tài khoản</h5>
-        <div class="modal-body">
-          <div class="mb-2">
-            <label for="infoEmail" class="form-label">Email</label>
-            <input type="email" id="infoEmail" class="form-control" />
-          </div>
-          <div class="mb-2">
-            <label for="infoPhone" class="form-label">Số điện thoại</label>
-            <input type="text" id="infoPhone" class="form-control" />
-          </div>
-          <div class="mb-2">
-            <label for="infoUsername" class="form-label">Tên đăng nhập</label>
-            <input type="text" id="infoUsername" class="form-control" />
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button id="btnEditUser" class="btn btn-warning">Cập nhật</button>
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</tbody>
+</body>
   <script type="module" src="index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
  
-</body>
 </html>
